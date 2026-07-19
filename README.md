@@ -32,15 +32,8 @@ SAPADARSI adalah **aplikasi web utama** untuk konsultasi multi-peran. Bersama Sa
 | Repo | Peran | Port / app |
 |------|-------|------------|
 | **[sapadarsi](https://github.com/mohfadhli27/sapadarsi)** (repo ini) | Web konsultasi **dokter, bidan, apoteker** | `:3030` |
-| **[sapabidan](https://github.com/mohfadhli27/sapabidan)** | Web konsultasi **bidan saja** (varian khusus kebidanan) | `:3031` |
-| **[darsi-webview](https://github.com/mohfadhli27/darsi-webview)** | Aplikasi mobile Flutter yang membungkus kedua web di atas | `sapadarsi_app` / `sapabidan_app` |
-
-**Cara berhubungan**
-
-1. Pasien membuka **SAPADARSI** di browser atau lewat app `sapadarsi_app` (WebView).
-2. Layanan kebidanan khusus memakai **SAPABIDAN** di browser atau lewat app `sapabidan_app`.
-3. WebView **tidak berisi logika konsultasi** — hanya menampilkan URL web yang sudah di-deploy.
-4. Sapabidan adalah fokus bidan; fitur dokter & apoteker tetap di Sapadarsi.
+| **[sapabidan](https://github.com/mohfadhli27/sapabidan)** | Web konsultasi **bidan saja** | `:3031` |
+| **[darsi-webview](https://github.com/mohfadhli27/darsi-webview)** | Flutter WebView untuk kedua web di atas | `sapadarsi_app` / `sapabidan_app` |
 
 ---
 
@@ -48,26 +41,32 @@ SAPADARSI adalah **aplikasi web utama** untuk konsultasi multi-peran. Bersama Sa
 
 | Modul | Deskripsi |
 |-------|-----------|
-| Konsultasi Dokter | Triase keluhan, pemilihan dokter spesialis, wawancara klinis bertahap, ringkasan & resep digital |
+| Konsultasi Dokter | Triase keluhan, pemilihan dokter spesialis, wawancara klinis, ringkasan & resep digital |
 | Konsultasi Bidan | Konsultasi kehamilan, kesehatan ibu, dan tumbuh kembang anak |
 | Konsultasi Apoteker | Screening obat, dosis, interaksi, dan saran penggunaan |
-| Portal Staff | Monitor sesi live, notifikasi, dan takeover konsultasi oleh tenaga medis |
+| Portal Staff | Monitor sesi live, notifikasi, dan takeover konsultasi |
 | Portal Admin | Manajemen akun staff dan sinkronisasi direktori dokter RSI |
-| Telegram Approval | Notifikasi grup Telegram saat konsultasi membutuhkan persetujuan |
+| Telegram Approval | Notifikasi grup Telegram untuk persetujuan konsultasi |
 
 ---
 
 ## Tech Stack
 
-| Layer | Teknologi |
-|-------|-----------|
-| Framework | Next.js 16 (App Router), React 19, TypeScript |
-| UI | Tailwind CSS 4, Radix UI, Framer Motion |
-| State | Zustand |
-| Database | PostgreSQL |
-| AI / LLM | Ollama / vLLM (OpenAI-compatible), orchestrator konsultasi |
-| Integrasi | API RSI Surabaya, Telegram Bot API |
-| Runtime | Node.js ≥ 20, PM2 (opsional) |
+| Layer | Teknologi | Keterangan |
+|-------|-----------|------------|
+| **Language** | TypeScript | Type-safe di seluruh codebase |
+| **Framework** | [Next.js 16](https://nextjs.org/) (App Router) | SSR/SSG, API Routes, middleware |
+| **UI** | React 19, Tailwind CSS 4, Radix UI, Framer Motion | Komponen aksesibel + animasi |
+| **Form & validasi** | React Hook Form, Zod | Validasi input pasien & staff |
+| **State** | Zustand | State chat, auth, sesi konsultasi |
+| **Database** | PostgreSQL + `pg` | Akun, sesi konsultasi, resep, staff |
+| **AI / LLM** | Ollama / vLLM (OpenAI-compatible) | Orchestrator konsultasi dokter/bidan/apoteker |
+| **Dokumen** | `pdf-lib`, `pdf-parse` | Generate & baca PDF resep/ringkasan |
+| **Integrasi** | API RSI Surabaya, Telegram Bot API | Direktori dokter + approval |
+| **Runtime** | Node.js ≥ 20, npm ≥ 10 | Wajib untuk development & production |
+| **Process manager** | PM2 (opsional) | Deploy produksi |
+
+**Port default:** `3030`
 
 ---
 
@@ -81,8 +80,6 @@ Pasien / Staff  →  SAPADARSI (Next.js :3030)
                         └── Telegram Bot
 ```
 
-Alur konsultasi dokter/bidan:
-
 1. Pasien memulai sesi → agent AI mewawancarai (*gathering* → *assessment* → *closing*).
 2. Respons divalidasi agar tidak mengulang pertanyaan generik.
 3. Jika diperlukan, notifikasi persetujuan dikirim ke grup Telegram.
@@ -92,78 +89,68 @@ Alur konsultasi dokter/bidan:
 
 ## Prasyarat
 
-- Node.js ≥ 20 dan npm ≥ 10
-- PostgreSQL (database sesuai `DATABASE_URL`)
-- Ollama atau endpoint LLM OpenAI-compatible (opsional untuk fitur AI penuh)
-- Telegram Bot + grup approval (opsional)
+Pastikan terpasang sebelum instalasi:
+
+| Komponen | Versi / catatan | Wajib? |
+|----------|-----------------|--------|
+| Node.js | ≥ 20 (`node -v`) | Ya |
+| npm | ≥ 10 (`npm -v`) | Ya |
+| PostgreSQL | Database siap (contoh: `hospital_cs`) | Ya (untuk fitur penuh) |
+| Git | Untuk clone repo | Ya |
+| Ollama / LLM endpoint | Chat & model klinis | Opsional (tanpa ini AI terbatas) |
+| Telegram Bot | BotFather + chat ID grup | Opsional (tanpa ini approval manual di portal) |
 
 ---
 
-## Instalasi
+## Instalasi (langkah demi langkah)
+
+### 1. Clone & masuk folder
 
 ```bash
 git clone https://github.com/mohfadhli27/sapadarsi.git
 cd sapadarsi
-
-npm install
-cp .env.example .env.local
-# Edit .env.local — isi DATABASE_URL, JWT_SECRET, dan konfigurasi LLM
-
-npm run dev
 ```
 
-Aplikasi berjalan di **http://localhost:3030**.
-
----
-
-## Variabel Lingkungan
-
-Salin `.env.example` ke `.env.local`. **Jangan commit file yang berisi secret.**
-
-### Database & Auth
-
-| Variabel | Wajib | Deskripsi |
-|----------|-------|-----------|
-| `DATABASE_URL` | Ya | Connection string PostgreSQL |
-| `JWT_SECRET` | Ya | Secret verifikasi JWT |
-| `NEXT_PUBLIC_AUTH_API_URL` | Opsional | URL auth API (default `http://localhost:4500`) |
-| `NEXT_PUBLIC_DEMO_LOGIN` | Opsional | Tombol login demo (`true` / `false`) |
-
-### LLM
-
-| Variabel | Deskripsi |
-|----------|-----------|
-| `LLM_PROFILE` | Profil LLM (contoh: `ollama-local-8b`) |
-| `OLLAMA_HOST` | Host Ollama (contoh: `http://127.0.0.1:11434`) |
-| `OLLAMA_MODEL` | Nama model Ollama |
-| `CHAT_API_BASE_URL` | Endpoint OpenAI-compatible (jika dipakai) |
-
-### Telegram & Publik
-
-| Variabel | Deskripsi |
-|----------|-----------|
-| `TELEGRAM_BOT_TOKEN` | Token bot dari BotFather |
-| `TELEGRAM_APPROVAL_GROUP_CHAT_ID` | Chat ID grup approval |
-| `DARSI_PUBLIC_URL` | URL publik aplikasi |
-| `NEXT_PUBLIC_APP_VARIANT` | Harus `sapadarsi` |
-| `NEXT_PUBLIC_PUBLIC_BASE_URL` | Base URL publik SAPADARSI |
-
-Template lengkap ada di `.env.example`.
-
----
-
-## Scripts
-
-| Perintah | Deskripsi |
-|----------|-----------|
-| `npm run dev` | Development server (port 3030) |
-| `npm run build` | Build produksi |
-| `npm run start` | Jalankan build produksi |
-| `npm run lint` | ESLint |
-
-### Migrasi database (opsional)
+### 2. Install dependensi
 
 ```bash
+npm install
+```
+
+### 3. Siapkan environment
+
+```bash
+cp .env.example .env.local
+```
+
+Edit `.env.local` — minimal isi:
+
+```env
+DATABASE_URL=postgresql://USER:PASSWORD@localhost:5432/hospital_cs
+JWT_SECRET=ganti-dengan-secret-yang-kuat
+NEXT_PUBLIC_APP_VARIANT=sapadarsi
+NEXT_PUBLIC_PUBLIC_BASE_URL=http://localhost:3030
+DARSI_PUBLIC_URL=http://localhost:3030
+```
+
+Untuk AI lokal (contoh Ollama):
+
+```env
+OLLAMA_HOST=http://127.0.0.1:11434
+LLM_PROFILE=ollama-local-8b
+CHAT_API_BASE_URL=http://127.0.0.1:11434/v1
+CHAT_MODEL=llama3.1:8b
+```
+
+> **Jangan commit** `.env.local`. Template aman ada di `.env.example`.
+
+### 4. (Opsional) Migrasi database
+
+Jika database masih kosong:
+
+```bash
+export DATABASE_URL="postgresql://USER:PASSWORD@localhost:5432/hospital_cs"
+
 psql "$DATABASE_URL" -f scripts/migrate-patient-accounts.sql
 psql "$DATABASE_URL" -f scripts/migrate-doctor-consultation.sql
 psql "$DATABASE_URL" -f scripts/migrate-consultation-phase.sql
@@ -174,17 +161,64 @@ psql "$DATABASE_URL" -f scripts/migrate-telegram-approval-messages.sql
 psql "$DATABASE_URL" -f scripts/migrate-admin-sync.sql
 ```
 
+### 5. Jalankan development server
+
+```bash
+npm run dev
+```
+
+Buka: **http://localhost:3030**
+
+### 6. Verifikasi cepat
+
+| Cek | Cara |
+|-----|------|
+| App terbuka | Browser ke `http://localhost:3030` |
+| Login demo | Set `NEXT_PUBLIC_DEMO_LOGIN=true` di `.env.local`, restart `npm run dev` |
+| DB terhubung | Login / buat sesi konsultasi tanpa error database |
+| LLM | Kirim pesan di chat; pastikan Ollama/vLLM hidup |
+
 ---
 
-## Deploy (PM2)
+## Variabel Lingkungan
+
+| Variabel | Wajib | Deskripsi |
+|----------|-------|-----------|
+| `DATABASE_URL` | Ya | Connection string PostgreSQL |
+| `JWT_SECRET` | Ya | Secret verifikasi JWT |
+| `NEXT_PUBLIC_APP_VARIANT` | Ya | Harus `sapadarsi` |
+| `NEXT_PUBLIC_PUBLIC_BASE_URL` | Ya | Base URL publik (dev: `http://localhost:3030`) |
+| `DARSI_PUBLIC_URL` | Direkomendasikan | URL di pesan Telegram |
+| `OLLAMA_HOST` / `CHAT_API_BASE_URL` | Opsional | Endpoint LLM |
+| `TELEGRAM_BOT_TOKEN` | Opsional | Token bot |
+| `TELEGRAM_APPROVAL_GROUP_CHAT_ID` | Opsional | Chat ID grup approval |
+| `NEXT_PUBLIC_DEMO_LOGIN` | Opsional | `true` = tombol login demo |
+
+Daftar lengkap: `.env.example`.
+
+---
+
+## Scripts NPM
+
+| Perintah | Deskripsi |
+|----------|-----------|
+| `npm run dev` | Development server di port **3030** |
+| `npm run build` | Build produksi (`.next/`) |
+| `npm run start` | Jalankan build produksi di port **3030** |
+| `npm run lint` | ESLint |
+
+---
+
+## Deploy produksi (PM2)
 
 ```bash
 npm run build
 pm2 start ecosystem.config.cjs
 pm2 save
+pm2 status
 ```
 
-Sesuaikan `cwd` di `ecosystem.config.cjs` jika path deployment berbeda.
+Sesuaikan `cwd` di `ecosystem.config.cjs` jika path server berbeda. Pastikan `NEXT_PUBLIC_DEMO_LOGIN=false` di produksi.
 
 ---
 
@@ -194,33 +228,43 @@ Sesuaikan `cwd` di `ecosystem.config.cjs` jika path deployment berbeda.
 sapadarsi/
 ├── app/                 # Next.js App Router (pages + API routes)
 ├── src/
-│   ├── components/      # Komponen UI
-│   ├── config/          # Konfigurasi variant & agent
-│   ├── hooks/           # React hooks
-│   ├── lib/             # Logika bisnis, LLM, DB, Telegram
-│   ├── stores/          # Zustand stores
+│   ├── components/      # UI (chat, doctor, bidan, staff, …)
+│   ├── config/          # Brand, agents, routes
+│   ├── hooks/           # Consultation chat, SSE, auth
+│   ├── lib/             # LLM, DB, Telegram, business logic
+│   ├── stores/          # Zustand
 │   └── types/
-├── scripts/             # Migrasi, seed, utilitas
-├── public/              # Aset statis & logo
-├── ecosystem.config.cjs # Konfigurasi PM2
-└── .env.example         # Template environment (tanpa secret)
+├── scripts/             # Migrasi & seed
+├── public/              # Logo & aset statis
+├── ecosystem.config.cjs # PM2
+└── .env.example         # Template env (tanpa secret)
 ```
+
+---
+
+## Troubleshooting singkat
+
+| Masalah | Solusi |
+|---------|--------|
+| `ECONNREFUSED` database | Cek PostgreSQL hidup & `DATABASE_URL` benar |
+| Port 3030 sudah dipakai | Hentikan proses lain, atau ubah port di `package.json` |
+| Chat AI tidak merespons | Cek Ollama (`ollama list`) / `OLLAMA_HOST` |
+| Telegram tidak kirim | Isi `TELEGRAM_BOT_TOKEN` + `TELEGRAM_APPROVAL_GROUP_CHAT_ID` |
 
 ---
 
 ## Keamanan
 
-- Jangan commit `.env`, `.env.local`, token Telegram, atau kredensial database.
+- Jangan commit `.env`, `.env.local`, token, atau kredensial DB.
 - Set `NEXT_PUBLIC_DEMO_LOGIN=false` di produksi.
-- Gunakan `JWT_SECRET` yang kuat dan unik per environment.
-- File sensitif dilindungi melalui `.gitignore`.
+- Pakai `JWT_SECRET` yang kuat dan unik.
 
 ---
 
 ## Lihat juga
 
 - [SAPABIDAN](https://github.com/mohfadhli27/sapabidan) — web konsultasi bidan
-- [DARSI WebView](https://github.com/mohfadhli27/darsi-webview) — Flutter shell untuk Sapadarsi & Sapabidan
+- [DARSI WebView](https://github.com/mohfadhli27/darsi-webview) — Flutter shell
 
 ---
 
