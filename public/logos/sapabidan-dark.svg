@@ -1,0 +1,22 @@
+<svg width="737" height="737" viewBox="0 0 737 737" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="72" y="72" width="593" height="593" rx="148" fill="url(#sb_bg_dark)"/>
+  <path
+    d="M494 248C494 196 442 156 374 156C294 156 234 206 234 278C234 338 284 378 364 398C444 418 484 458 484 518C484 588 414 638 334 638C254 638 184 598 144 548L204 488C234 528 284 558 334 558C384 558 414 528 414 488C414 448 374 428 304 410C224 388 154 338 154 268C154 188 234 118 374 118C464 118 534 158 564 218L494 248Z"
+    fill="url(#sb_letter_dark)"
+  />
+  <circle cx="264" cy="518" r="40" fill="url(#sb_dot_dark)"/>
+  <defs>
+    <linearGradient id="sb_bg_dark" x1="72" y1="72" x2="665" y2="665" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#047857"/>
+      <stop offset="1" stop-color="#10B981"/>
+    </linearGradient>
+    <linearGradient id="sb_letter_dark" x1="154" y1="118" x2="564" y2="638" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ECFDF5"/>
+      <stop offset="1" stop-color="#6EE7B7"/>
+    </linearGradient>
+    <linearGradient id="sb_dot_dark" x1="224" y1="478" x2="304" y2="558" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#D1FAE5"/>
+      <stop offset="1" stop-color="#34D399"/>
+    </linearGradient>
+  </defs>
+</svg>

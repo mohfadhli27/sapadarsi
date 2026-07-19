@@ -1,0 +1,57 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Next.js / build
+.next/
+out/
+dist/
+build/
+.turbo/
+*.tsbuildinfo
+
+# Environment & secrets — JANGAN commit
+.env
+.env.*
+!.env.example
+!.env.sapadarsi.example
+!.env.sapabidan.example
+*.pem
+*.key
+credentials.json
+**/secrets/
+**/key.properties
+
+# Debug / logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+logs/
+
+# Local temp & cache
+.tmp/
+.npm-cache/
+.cache/
+coverage/
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+.cursor/
+*.swp
+*.swo
+
+# Runtime
+.voltagent/
+.threads/
+*.sqlite
+*.db
+
+# Database dumps
+*.dump
+*.sql.bak
+backup*.sql

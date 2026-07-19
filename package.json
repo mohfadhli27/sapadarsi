@@ -1,0 +1,55 @@
+{
+  "name": "sapadarsi",
+  "version": "0.1.0",
+  "private": true,
+  "description": "SAPADARSI \u2014 Sistem Asisten Pasien Digital RSI Surabaya A. Yani",
+  "scripts": {
+    "dev": "next dev -p 3030",
+    "build": "next build",
+    "build:sapadarsi": "bash scripts/build-sapadarsi.sh",
+    "start": "next start -p 3030",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^5.1.0",
+    "@radix-ui/react-avatar": "^1.1.10",
+    "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-separator": "^1.1.8",
+    "@radix-ui/react-slot": "^1.2.3",
+    "@radix-ui/react-tooltip": "^1.2.8",
+    "@types/pg": "^8.20.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "csstype": "3.1.3",
+    "framer-motion": "^12.23.25",
+    "lucide-react": "^0.460.0",
+    "next": "^16.2.1",
+    "next-themes": "^0.4.6",
+    "pdf-lib": "^1.17.1",
+    "pdf-parse": "^2.4.5",
+    "pg": "^8.22.0",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
+    "react-hook-form": "^7.56.4",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
+    "tailwind-merge": "^3.3.1",
+    "tw-animate-css": "^1.4.0",
+    "zod": "^3.25.76",
+    "zustand": "^5.0.9"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4.1.4",
+    "@types/node": "^24.2.1",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "^16.0.7",
+    "tailwindcss": "^4.1.4",
+    "typescript": "^5.8.2"
+  },
+  "optionalDependencies": {
+    "lightningcss-linux-x64-gnu": "^1.32.0"
+  }
+}
