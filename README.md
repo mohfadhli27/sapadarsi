@@ -8,6 +8,42 @@ SAPADARSI membantu pasien melakukan konsultasi awal dengan agent AI **dokter**, 
 
 ---
 
+## Ekosistem DARSI (korelasi proyek)
+
+SAPADARSI adalah **aplikasi web utama** untuk konsultasi multi-peran. Bersama Sapabidan dan WebView, ketiganya membentuk satu ekosistem:
+
+```text
+                    ┌─────────────────────┐
+                    │   darsi-webview     │  Flutter (shell native)
+                    │  sapadarsi_app  ────┼──► memuat URL SAPADARSI
+                    │  sapabidan_app  ────┼──► memuat URL SAPABIDAN
+                    └─────────────────────┘
+                              │
+              ┌───────────────┴───────────────┐
+              ▼                               ▼
+   ┌──────────────────┐            ┌──────────────────┐
+   │    sapadarsi     │            │    sapabidan     │
+   │  Web :3030       │            │  Web :3031       │
+   │  dokter · bidan  │            │  bidan saja      │
+   │  · apoteker      │            │                  │
+   └──────────────────┘            └──────────────────┘
+```
+
+| Repo | Peran | Port / app |
+|------|-------|------------|
+| **[sapadarsi](https://github.com/mohfadhli27/sapadarsi)** (repo ini) | Web konsultasi **dokter, bidan, apoteker** | `:3030` |
+| **[sapabidan](https://github.com/mohfadhli27/sapabidan)** | Web konsultasi **bidan saja** (varian khusus kebidanan) | `:3031` |
+| **[darsi-webview](https://github.com/mohfadhli27/darsi-webview)** | Aplikasi mobile Flutter yang membungkus kedua web di atas | `sapadarsi_app` / `sapabidan_app` |
+
+**Cara berhubungan**
+
+1. Pasien membuka **SAPADARSI** di browser atau lewat app `sapadarsi_app` (WebView).
+2. Layanan kebidanan khusus memakai **SAPABIDAN** di browser atau lewat app `sapabidan_app`.
+3. WebView **tidak berisi logika konsultasi** — hanya menampilkan URL web yang sudah di-deploy.
+4. Sapabidan adalah fokus bidan; fitur dokter & apoteker tetap di Sapadarsi.
+
+---
+
 ## Fitur Utama
 
 | Modul | Deskripsi |
@@ -178,6 +214,13 @@ sapadarsi/
 - Set `NEXT_PUBLIC_DEMO_LOGIN=false` di produksi.
 - Gunakan `JWT_SECRET` yang kuat dan unik per environment.
 - File sensitif dilindungi melalui `.gitignore`.
+
+---
+
+## Lihat juga
+
+- [SAPABIDAN](https://github.com/mohfadhli27/sapabidan) — web konsultasi bidan
+- [DARSI WebView](https://github.com/mohfadhli27/darsi-webview) — Flutter shell untuk Sapadarsi & Sapabidan
 
 ---
 
